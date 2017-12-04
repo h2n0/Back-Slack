@@ -1,3 +1,5 @@
+//The file where all the magic happens
+
 function $(id){
 	return document.getElementById(id);
 }
@@ -6,6 +8,7 @@ function $(id){
 let lastChannel = null;
 let threadActive = false;
 
+//Toggle the active state in the channelList
 function toggle(channel){
 	if(lastChannel){
 		lastChannel.classList.remove("active");
@@ -14,6 +17,7 @@ function toggle(channel){
 	lastChannel = channel;
 }
 
+//Toggle the visibility of the Thread panel
 function toggleThread(actual){
 	if(actual != undefined){
 		if(actual){
@@ -31,6 +35,18 @@ function toggleThread(actual){
 	}
 }
 
+
+/**
+	Construct a message with the provided input
+	===================
+	threadID = int
+	username = string
+	time = float
+	msg = string
+	thread = boolean
+	===================
+	return string
+**/
 function makeMessage(threadID, username, time, msg, thread){
 	let d = new Date(0);
 	d.setUTCSeconds(time);
@@ -45,6 +61,13 @@ function makeMessage(threadID, username, time, msg, thread){
 	return "<li threadID=" + threadID + ">" + res + "</li>";
 }
 
+/**
+	Fill the content section with the given messages and users
+	==============
+	messages = array of messages (see parse.js)
+	users = hash of users (see parse.js)
+
+**/
 function fillContent(messages, users){
 	$("content").children[0].innerHTML = "";
 	
@@ -53,6 +76,17 @@ function fillContent(messages, users){
 	}
 }
 
+
+/**
+	Fix the slack formatting of strings
+	===============
+	chans = array of channels (see parse.js)
+	users = array of users (see parse.js)
+	msgs = array of messages (see parse.js)
+	===============
+	returns array of messages
+
+**/
 function fixFormatting(chans, users, msgs){
 	for(var i = 0; i < msgs.length; i++){
 		let c = msgs[i];
@@ -62,16 +96,16 @@ function fixFormatting(chans, users, msgs){
 			}
 		}
 	
-		let reg = /(<(.*?)>)/g;
+		let reg = /(<(.*?)>)/g; // Looking for anything held between '<' & '>'
 		let parts = c.text.match(reg);
 		if(parts){
 			for(var j = 0; j < parts.length; j++){
 				let cp = parts[j].substring(1, parts[j].length-1);
-				if(cp.indexOf("|") != -1){//Chanel reference
+				if(cp.indexOf("|") != -1){// Channel reference
 					let chanID = cp.substring(0, cp.indexOf("|"));
 					let chanText = cp.substring(cp.indexOf("|")+1);
 					msgs[i].text = msgs[i].text.replace(parts[j], "<span onclick=changeToChannel('"+chanID+"') class='chanRef'>#"+chanText+"</span>");
-				}else if(cp.indexOf("@") != -1){//User mention
+				}else if(cp.indexOf("@") != -1){// User mention
 					console.log(msgs[i]);
 					msgs[i].text = msgs[i].text.replace(parts[j], "<span class='userMention'>@"+users[cp.substring(1)]+"</span>");
 				}else{
@@ -104,6 +138,7 @@ function fixFormatting(chans, users, msgs){
 	return msgs;
 }
 
+// If we have data we can populate and proceseed with the program
 if( hasData() ){
 	let chans = getChannels();
 	let users = getUsers();
