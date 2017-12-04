@@ -1,0 +1,117 @@
+html{
+	font-family: sans-serif !important;
+}
+
+body{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	overflow: hidden;
+}
+
+#wrapper{
+	width: 100%;
+	height: 100%;
+}
+
+#side{
+	width: 20%;
+	height: 100%;
+	float: left;
+	background-color: #CCC;
+}
+
+#channelList{
+	list-style: none;
+	padding: 0px;
+	max-height: 85%;
+	overflow-x: none;
+	overflow-y: scroll;
+}
+
+#channelList li{
+	padding-top: 16px;
+	padding-bottom: 16px;
+	text-align:center;
+	cursor: pointer;
+}
+
+#channelList li.active{
+	background-color: #999;
+}
+
+#content{
+	width: 80%;
+	height: 100%;
+	float: right;
+	background-color: #EEE;
+	overflow-y: scroll;
+}
+
+#thread{
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 40%;
+	height: 100%;
+	background-color: #999;
+	padding-top: 10px;
+	overflow-y: scroll;
+	transform: translateX(100%);
+	transition: transform 0.1s ease-in-out;
+}
+
+#thread.active{
+	transform: translateX(0);
+}
+
+#thread h2{
+	text-align: center;
+}
+
+#closeThread{
+	position: relative;
+	height: 32px;
+	width: 32px;
+	float: right;
+	right: 5%;
+	background-color: #0FF;
+}
+
+#threadContent {
+	overflow-y: scroll;
+}
+
+.username{
+	font-weight: bold;
+}
+
+.bold{
+	font-weight: bold;
+}
+
+.italic{
+	font-style: italic;
+}
+
+.userMention{
+	color: #55F;
+}
+
+.chanRef{
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.spaced{
+	background-color: #777;
+	text-align: center;
+	padding-top: 16px;
+	padding-bottom: 16px;
+	color: white;
+	font-weight: bold;
+	font-size: 1.3em;
+}
