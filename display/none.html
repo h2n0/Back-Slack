@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="./style.css" rel="stylesheet" type="text/css" />
+		<title>Slack-back</title>
+	</head>
+	
+	<body>
+		<div class="center-none">
+			<h1>Whoa!</h1>
+			<p>Couldn't seem to find a "data" directory</p>
+			<div class="dropbox" id="dropzone">
+				<p>Drop your data.zip here</p>
+			</div>
+		</div>
+		
+		<script>
+			(function(){
+				let dz = document.getElementById("dropzone");
+			
+				dz.ondragover = () => {
+					return false;
+				};
+			
+				dz.ondragleave = () => {
+					return false;
+				};
+			
+				dz.ondragend = () => {
+					return false;
+				};
+			
+				dz.ondrop = (e) => {
+					e.preventDefault();			
+					let f = e.dataTransfer.files[0];
+					let p = f.path;
+					let fs = require("fs");
+					let extract = require("extract-zip");
+					extract(p, {dir: __dirname+"/../data/"}, (err) => {;
+						if(fs.existsSync(__dirname+"/../data/users.json")){
+							window.location = __dirname+"/../display/index.html";
+						}else{
+							alert("Looks like this zip file wansn't a slack export");
+							fs.rmdirSync(__dirname+"/../data/");
+						}
+					});
+					return false;
+				};
+			})();
+		</script>
+	</body>
+
+</html>
