@@ -19,6 +19,8 @@
 		</div>
 		
 		<script>
+		
+			// Boiler plate required for drag and drop to work
 			(function(){
 				let dz = document.getElementById("dropzone");
 			
@@ -40,7 +42,9 @@
 					let p = f.path;
 					let fs = require("fs");
 					let extract = require("extract-zip");
-					extract(p, {dir: __dirname+"/../data/"}, (err) => {;
+					extract(p, {dir: __dirname+"/../data/"}, (err) => {
+					
+						// If we find user, it's probably worked
 						if(fs.existsSync(__dirname+"/../data/users.json")){
 							window.location = __dirname+"/../display/index.html";
 						}else{
