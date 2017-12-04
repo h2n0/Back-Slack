@@ -58,7 +58,7 @@ function makeMessage(threadID, username, time, msg, thread){
 	if(thread){
 		res += "<strong onclick=thread(this)>THREAD!</strong>";
 	}
-	return "<li threadID=" + threadID + ">" + res + "</li>";
+	return "<li threadID=" + threadID + " class='channelMessage " + (threadID%2==0?"messageEven":"") + "'>" + res + "</li>";
 }
 
 /**
@@ -181,12 +181,12 @@ if( hasData() ){
 		toggleThread(true);
 		let id = e.parentElement.getAttribute("threadID");
 		
-		$("threadContent").innerHTML = "";
+		$("threadContent").children[0].innerHTML = "";
 		
 		let messages = lastMessages[id].replies;
 		
 		for(var i = 0; i < messages.length; i++){
-			$("threadContent").innerHTML += makeMessage(i, users[messages[i].user], messages[i].ts, messages[i].text);
+			$("threadContent").children[0].innerHTML += makeMessage(i, users[messages[i].user], messages[i].ts, messages[i].text);
 		}
 	}
 	
