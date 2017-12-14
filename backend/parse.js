@@ -1,7 +1,23 @@
+var Channel = function(data){
+	this.id = data.id;
+	this.name = data.name;
+	this.inner = null;
+	this.lastMessageID = 0;
+	this.raw_messages = getMessages(data);
+	this.fixed_messages = null;
+}
+
+
+
+
 function getChannels(){
 	let j = fs.readFileSync(path+"/channels.json", {encoding:"utf-8"});
 	let chan = JSON.parse(j);
-	return chan;
+	let chanObjs = [];
+	for(var i = 0; i < chan.length; i++){
+		chanObjs.push(new Channel(chan[i]));
+	}
+	return chanObjs;
 }
 
 function getUsers(){	
@@ -24,10 +40,19 @@ function sortReplies(messages){
 		if(c.thread){
 			if(parent != null){
 				for(var j = i; j < messages.length; j++){
-					if(messages[j].threadTs){
-						if(messages[j].threadTs == parent.threadTs){
+					if(messages[j].thread){
+						if(messages[j].parentID == parent.user){
 							parent.replies.push(messages.splice(j,1)[0]);
 							if(parent.replies.length == parent.replyCount){
+								if(parent.replies.length > 1){
+									console.log(parent);
+									console.log(parent.replies);
+									parent.replies.sort( function(a,b){
+										return a.ts - b.ts;
+									});
+									console.log(parent.replies);
+									console.log("");
+								}
 								parent = null;
 								break;
 							}
@@ -46,9 +71,13 @@ function sortReplies(messages){
 }
 
 function getMessages(channel){
-	let files = fs.readdirSync(path+"/"+channel.name+"/"); // For now we only have one file
+	let files = fs.readdirSync(path+"/"+channel.name+"/"); // Get all the files in a give directory
 	let messages = [];
 	for(var i = 0; i < files.length; i++){
+	
+		if(!files[i].match(/[0-9]{4}-[0-9]{2}-[0-9]{2}/g)){ // if it's not in this format, don't process it
+			continue;
+		}
 		let js = fs.readFileSync(path+"/"+channel.name+"/"+files[i], {encoding:"utf-8"});
 		let msgs = JSON.parse(js);
 		for(var j = 0; j < msgs.length; j++){
@@ -59,7 +88,7 @@ function getMessages(channel){
 			
 			let thread = false;
 			
-			if(msgs[j].reply_count || msgs[j].thread_ts){
+			if((msgs[j].reply_count && msgs[j].thread_ts) || (msgs[j].parent_user_id)){
 				thread = true;
 			}
 		
