@@ -10,6 +10,7 @@ let threadActive = false;
 
 //Toggle the active state in the channelList
 function toggle(channel){
+	$("noChannel").classList.add("hidden");
 	if(lastChannel){
 		lastChannel.classList.remove("active");
 	}
@@ -23,7 +24,7 @@ function toggleThread(actual){
 		if(actual){
 			if(threadActive)return;
 			$("thread").classList.add("active");
-			threadActive = true;	
+			threadActive = true;
 		}else{
 			if(!threadActive)return;
 			$("thread").classList.remove("active");
@@ -47,14 +48,14 @@ function toggleThread(actual){
 	===================
 	return string
 **/
-function makeMessage(threadID, username, time, msg, thread){
+function makeMessage(threadID, user, time, msg, thread){
 	let d = new Date(0);
 	d.setUTCSeconds(time);
 	let dateString = "" + ((""+(d.getHours()%12)).padStart(2, "0")) + ":" + (""+d.getMinutes()).padStart(2,"0") + " " + ((""+d.getHours()).padStart(2, "0") > 12?"PM":"AM") + " - " + (""+d.getDate()).padStart(2, "0") + "/" + (""+d.getMonth()).padStart(2, "0") + "/" + (""+d.getFullYear()).substring(2);
-	let p = "<p class='username'>" + username + " <span>" + dateString + "</span></p>";
+	let p = "<img src='"+user.img+"'></img><p class='username'>" + user.name +" <span>" + dateString + "</span></p>";
 	let m = "<p>" + msg + "</p>";
 	let res = p + m;
-	
+
 	if(thread){
 		res += "<strong onclick=thread(this)>THREAD!</strong>";
 	}
@@ -76,18 +77,18 @@ function fillContent(messages, users, last){
 	}
 	$("content").children[0].innerHTML = "";
 	let lastMessageID = 0;
-	
+
 	for(var i = 0; i < (last?last:50); i++){
 		if(!messages[i])break;
 		$("content").children[0].innerHTML += makeMessage(i, users[messages[i].user], messages[i].ts, messages[i].text, messages[i].thread?true:false);
 		lastMessageID = i;
 	}
-	
+
 	lastMessageID++;
 	if(messages.length > lastMessageID){
 		$("content").children[0].innerHTML += "<p LoadMore=true>LoadMore!</p>";
 	}
-	
+
 	return {inner:$("content").children[0].innerHTML, last: lastMessageID};
 }
 
@@ -103,13 +104,13 @@ function appendContent(messages, users, lastMessageID, callback){
 		$("content").children[0].innerHTML += makeMessage(lastMessageID + actual, users[messages[i].user], messages[i].ts, messages[i].text, messages[i].thread?true:false);
 		actual++;
 	}
-	
+
 	lastMessageID += actual + 1;
 	if(messages.length > lastMessageID){
 		$("content").children[0].innerHTML += "<p LoadMore=true>LoadMore!</p>";
 	}
-	
-	
+
+
 	if(callback){
 		callback({inner:$("content").children[0].innerHTML, last: lastMessageID});
 	}else{
@@ -136,7 +137,7 @@ function fixFormatting(chans, users, msgs){
 				fixFormatting(chans, users, c.replies);
 			}
 		}
-	
+
 		let reg = /(<(.*?)>)/g; // Looking for anything held between '<' & '>'
 		let parts = c.text.match(reg);
 		if(parts){
@@ -146,15 +147,14 @@ function fixFormatting(chans, users, msgs){
 					let chanID = cp.substring(0, cp.indexOf("|"));
 					let chanText = cp.substring(cp.indexOf("|")+1);
 					msgs[i].text = msgs[i].text.replace(parts[j], "<span onclick=changeToChannel('"+chanID+"') class='chanRef'>#"+chanText+"</span>");
-				}else if(cp.indexOf("@") != -1){// User mention
-					//console.log(msgs[i]);
-					msgs[i].text = msgs[i].text.replace(parts[j], "<span class='userMention'>@"+users[cp.substring(1)]+"</span>");
+				}else if(cp.indexOf("@") == 0){// User mention
+					msgs[i].text = msgs[i].text.replace(parts[j], "<span class='userMention'>@"+users[cp.substring(1)].name+"</span>");
 				}else{
-				
+
 				}
 			}
 		}
-		
+
 		reg = /(\*(.*?)\*)/g;// Looking for bold
 		parts = c.text.match(reg);
 		if(parts){
@@ -163,7 +163,7 @@ function fixFormatting(chans, users, msgs){
 				msgs[i].text = msgs[i].text.replace(parts[j], "<span class='bold'>"+cp+"</span>");
 			}
 		}
-		
+
 		reg = /_(.*?)_/g;// Looking for italic
 		parts = c.text.match(reg);
 		if(parts){
@@ -172,7 +172,7 @@ function fixFormatting(chans, users, msgs){
 				msgs[i].text = msgs[i].text.replace(parts[j], "<span class='italic'>"+cp+"</span>");
 			}
 		}
-		
+
 		reg = /(\n)/g; // Looking for new lines
 		msgs[i].text = msgs[i].text.replace(reg, "<br>");
 	}
@@ -180,9 +180,10 @@ function fixFormatting(chans, users, msgs){
 }
 
 // If we have data we can populate and proceseed with the program
+let chans = null;
+let users = null;
 if( hasData() ){
-	let chans = getChannels();
-	let users = getUsers();
+	reload();
 	let lastMessages = null;
 	let lastMessageID = 0;
 	let channelIndex = 0;
@@ -193,10 +194,10 @@ if( hasData() ){
 		$("channelList").innerHTML += "<li>"+ chans[i].name +"</li>";
 		chans[i].fixed_messages = fixFormatting(chans, users, chans[i].raw_messages);
 	}
-	
+
 	//Add mouse event to it
 	$("channelList").onmousedown = (e) => {
-	
+
 		if(e.target.nodeName == "LI"){
 			channelIndex = -1;
 			for(var i = 0; i < chans.length; i++){
@@ -218,27 +219,36 @@ if( hasData() ){
 			chans[channelIndex].lastMessageID = res.last;
 		}
 	}
-	
+
 	// Make sure we can close the thread bar
 	$("closeThread").onmousedown = (e) => {
 		toggleThread(false);
 	}
-	
-	
+
+	// Toggle the display of the update window
+	$("updateButton").onmousedown = (e) =>{
+		showUpdatePannel();
+	}
+
+
 	// User clicked a THREAD! element
 	function thread(e){
 		toggleThread(true);
 		let id = e.parentElement.getAttribute("threadID");
-		
+
 		$("threadContent").children[0].innerHTML = "";
-		
+
 		let messages = lastMessages[id].replies;
-		
+
 		for(var i = 0; i < messages.length; i++){
 			$("threadContent").children[0].innerHTML += makeMessage(i, users[messages[i].user], messages[i].ts, messages[i].text);
 		}
 	}
-	
+
+	function showUpdatePannel(){
+		$("updatePanel").classList.toggle("hidden");
+	}
+
 	// User clicked a channel reference
 	function changeToChannel(changeTo) {
 		if(!changeTo)return;
@@ -254,9 +264,9 @@ if( hasData() ){
 			alert("Couldn't find channel");
 			return;
 		}
-		
+
 		scrollToTop();
-		
+
 		toggle($("channelList").children[channelIndex]);
 		lastMessages = fixFormatting(chans, users, getMessages(chans[channelIndex]));
 		let res = fillContent(lastMessages, users);
@@ -264,14 +274,14 @@ if( hasData() ){
 		chans[channelIndex].inner = res.inner;
 		lastMessageID = res.last;
 	}
-	
+
 	$("content").onwheel = (e) => {scrollCheck()};
 	$("content").onscroll = (e) => {scrollCheck()};
-	
+
 	function scrollCheck(){
 		if(channelIndex == -1)return;
 		let shouldUpdate = $("content").scrollTop + $("content").clientHeight >= ($("content").children[0].clientHeight / 6) * 5;
-		
+
 		if(shouldUpdate){
 			if($("channelMessages").children[$("channelMessages").children.length-1].getAttribute("LoadMore") && canUpdate){
 				appendContent(lastMessages, users, chans[channelIndex].lastMessageID, (data) => {
@@ -284,9 +294,18 @@ if( hasData() ){
 			canUpdate = true;
 		}
 	}
-	
-	
+
+
+	/**
+	Scroll the content panel back to the top
+	**/
 	function scrollToTop(){
 		$("content").scrollTop = 0;
+	}
+
+
+	function reload(){
+		chans = getChannels();
+		users = getUsers();
 	}
 }

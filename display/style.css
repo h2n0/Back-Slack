@@ -2,6 +2,10 @@ html{
 	font-family: sans-serif !important;
 }
 
+.hidden{
+	display: none;
+}
+
 body{
 	position: absolute;
 	top: 0;
@@ -41,6 +45,17 @@ body{
 
 #channelList li.active{
 	background-color: #999;
+}
+
+#noChannel{
+	position: relative;
+	width: 50%;
+	height: 20%;
+	left:25%;
+	top: 35%;
+	text-align: center;
+	color: #333;
+	font-size: 1.3em;
 }
 
 #content{
@@ -92,6 +107,7 @@ body{
 	overflow-y: scroll;
 }
 
+
 .username{
 	font-weight: bold;
 }
@@ -128,6 +144,8 @@ div.center-none{
 }
 
 .spaced{
+	display: inline-block;
+	width: 100%;
 	background-color: #777;
 	text-align: center;
 	padding-top: 16px;
@@ -141,4 +159,48 @@ div.center-none{
 	background-color: #CCC;
 	padding-top: 4px;
 	padding-bottom: 4px;
+}
+
+.update{
+	display: inline-block;
+	width: 32px;
+	height: 32px;
+	vertical-align: middle;
+	cursor: pointer;
+	background-image: url("update1.png");
+
+	transition: 0.125s ease-in;
+}
+
+.update:hover{
+	background-image: url("update2.png");
+}
+
+#updatePanel{
+	display: block;
+	position: absolute;
+	border: 2px solid white;
+	border-radius: 10px;
+	top: 11%;
+	left: 5%;
+	width: 200px;
+	height: 200px;
+	background-color: white;
+	transition: 0.125s ease-in-out;
+}
+
+#updatePanel.hidden{
+	height: 0px;
+	border: 0px solid white;
+}
+
+#updatePanel > span#point{
+	display: block;
+	position: relative;
+	width: 25px;
+	height: 25px;
+	top: -5%;
+	left: 42%;
+	background-color: #FFF;
+	transform: rotate(45deg);
 }

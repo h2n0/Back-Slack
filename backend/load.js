@@ -1,5 +1,3 @@
-// Just making sure that we have data nothing to see here
-
 const fs = require("fs");
 
 let dataExists = false;

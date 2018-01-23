@@ -8,23 +8,28 @@
 		<link href="./style.css" rel="stylesheet" type="text/css" />
 		<title>Slack-back</title>
 	</head>
-	
+
 	<body>
 		<div id="wrapper">
 			<div id="side"> <!-- Side -->
 				<div class="spaced">
-					Channels
+					Channels<div class="update" id="updateButton"></div>
 				</div>
 				<ul id="channelList">
 				</ul>
 			</div>
-		
-		
+
+
 			<div id="content"> <!-- Main -->
 				<ul id="channelMessages">
 				</ul>
+
+				<div id="noChannel">
+					<h3>No Channel Selected</h3>
+					<p>Left click one on the left hand side</p>
+				</div>
 			</div>
-			
+
 			<div id="thread"> <!-- Thread -->
 				<div id="closeThread"></div>
 				<h2>Thread</h2>
@@ -33,11 +38,17 @@
 					</ul>
 				</div>
 			</div>
+
+			<div id="updatePanel" class="hidden">
+				<span id="point"></span>
+				Update
+			</div>
 		</div>
-		
-		
+
+
 		<script src="../backend/load.js"></script>
 		<script src="../backend/parse.js"></script>
+		<script src="../backend/data.js"></script>
 		<script src="./fun.js"></script>
 	</body>
 
