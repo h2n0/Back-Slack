@@ -7,7 +7,7 @@
 		"build": "electron-packager . Back-Slack builds"
 	},
 	"dependencies": {
-		"electron": "^1.8.1",
+		"electron": "^1.8.2-beta.4",
 		"electron-packager": "^10.1.1",
 		"extract-zip": "^1.6.6"
 	}
